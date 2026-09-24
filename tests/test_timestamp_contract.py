@@ -1,6 +1,6 @@
 """Regression tests for the timestamp contract in discovery and node modules."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 from src.discovery import DiscoveryAnnouncement
 from src.node import Node, NodeStatus
@@ -8,7 +8,7 @@ from src.node import Node, NodeStatus
 
 def test_ttl_boundary_with_controlled_clock():
     """Verify is_expired behavior before, at, and after the TTL boundary using a controlled clock."""
-    base_time = datetime(2026, 4, 15, 12, 0, 0, tzinfo=timezone.utc)
+    base_time = datetime(2026, 4, 15, 12, 0, 0, tzinfo=UTC)
     ttl = 300
     announcement = DiscoveryAnnouncement(
         node_id="utc-node",
@@ -36,7 +36,7 @@ def test_non_utc_offset_timestamp():
     """Verify that equivalent non-UTC offset timestamps compare safely without error."""
     # 14:00 UTC+2 is equivalent to 12:00 UTC
     tz_plus_two = timezone(timedelta(hours=2))
-    base_time_utc = datetime(2026, 4, 15, 12, 0, 0, tzinfo=timezone.utc)
+    base_time_utc = datetime(2026, 4, 15, 12, 0, 0, tzinfo=UTC)
     base_time_non_utc = datetime(2026, 4, 15, 14, 0, 0, tzinfo=tz_plus_two)
 
     announcement = DiscoveryAnnouncement(
@@ -85,7 +85,7 @@ def test_default_announcement_timestamp_is_aware_utc():
     )
 
     assert announcement.timestamp.tzinfo is not None
-    assert announcement.timestamp.tzinfo == timezone.utc
+    assert announcement.timestamp.tzinfo == UTC
 
 
 def test_node_heartbeat_aware_utc_and_serialization():
@@ -98,7 +98,7 @@ def test_node_heartbeat_aware_utc_and_serialization():
     assert node.status == NodeStatus.ONLINE
     assert node.last_heartbeat is not None
     assert node.last_heartbeat.tzinfo is not None
-    assert node.last_heartbeat.tzinfo == timezone.utc
+    assert node.last_heartbeat.tzinfo == UTC
 
     entry = node.to_registry_entry()
     assert entry["last_heartbeat"] is not None
