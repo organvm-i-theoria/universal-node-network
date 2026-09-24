@@ -8,7 +8,7 @@ the orchestration layer.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
@@ -65,7 +65,7 @@ class Node:
 
     def heartbeat(self) -> None:
         """Update the last heartbeat timestamp and ensure ONLINE status."""
-        self.last_heartbeat = datetime.now()
+        self.last_heartbeat = datetime.now(UTC)
         if self.status == NodeStatus.INITIALIZING:
             self.status = NodeStatus.ONLINE
 
