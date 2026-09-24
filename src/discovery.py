@@ -7,7 +7,7 @@ themselves and existing nodes to find peers by capability or organ affiliation.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from .node import Node, NodeCapability, NodeStatus
 
@@ -20,12 +20,14 @@ class DiscoveryAnnouncement:
     organ: str
     endpoint: str
     capabilities: list[str]
-    timestamp: datetime = field(default_factory=datetime.now)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     ttl_seconds: int = 300
 
-    def is_expired(self) -> bool:
+    def is_expired(self, now: datetime | None = None) -> bool:
         """Check if this announcement has exceeded its time-to-live."""
-        return datetime.now() > self.timestamp + timedelta(seconds=self.ttl_seconds)
+        current_time = (now if now is not None else datetime.now(UTC)).astimezone(UTC)
+        announcement_time = self.timestamp.astimezone(UTC)
+        return current_time > announcement_time + timedelta(seconds=self.ttl_seconds)
 
 
 class DiscoveryService:
